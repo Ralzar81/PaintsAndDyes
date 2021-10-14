@@ -1,0 +1,42 @@
+[
+    {
+        "index": 555,
+        "name": "Armor Paint",
+        "baseWeight": 1.0,
+        "hitPoints": 20,
+        "capacityOrTarget": 0,
+        "basePrice": 100,
+        "enchantmentPoints": 0,
+        "rarity": 5,
+        "variants": 0,
+        "drawOrderOrEffect": 0,
+        "isBluntWeapon": false,
+        "isLiquid": false,
+        "isOneHanded": false,
+        "isIngredient": false,
+        "worldTextureArchive": 555,
+        "worldTextureRecord": 0,
+        "playerTextureArchive": 0,
+        "playerTextureRecord": 0
+    },
+    {
+        "index": 556,
+        "name": "Clothing Dye",
+        "baseWeight": 1.0,
+        "hitPoints": 20,
+        "capacityOrTarget": 0,
+        "basePrice": 100,
+        "enchantmentPoints": 0,
+        "rarity": 3,
+        "variants": 0,
+        "drawOrderOrEffect": 0,
+        "isBluntWeapon": false,
+        "isLiquid": false,
+        "isOneHanded": false,
+        "isIngredient": false,
+        "worldTextureArchive": 556,
+        "worldTextureRecord": 0,
+        "playerTextureArchive": 0,
+        "playerTextureRecord": 0
+    }
+]
