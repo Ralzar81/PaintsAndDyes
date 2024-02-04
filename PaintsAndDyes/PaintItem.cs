@@ -25,6 +25,7 @@ namespace PaintsAndDyes
         public static DyeColors color = DyeColors.Blue;
 
         static DaggerfallUnityItem paintBeingUsed = null;
+        static ItemCollection collectionBeingUsed = null;
 
         public Paint() : base(ItemGroups.UselessItems2, templateIndex)
         {
@@ -44,10 +45,9 @@ namespace PaintsAndDyes
             //Daedric = 25,
             int roll = Random.Range(15, 26);
 
-
             if (color != DyeColors.Blue)
                 dyeColor = color;
-            else if (roll == 17)
+            else if (roll == 17 || roll == 18)
                 dyeColor = DyeColors.Silver;
             else
                 dyeColor = (DyeColors)roll;
@@ -76,6 +76,7 @@ namespace PaintsAndDyes
             }
 
             paintBeingUsed = this;
+            collectionBeingUsed = collection;
             DaggerfallListPickerWindow validItemPicker = new DaggerfallListPickerWindow(uiManager, uiManager.TopWindow);
             validItemPicker.OnItemPicked += Paint_OnItemPicked;
             validPaintItems.Clear();
@@ -108,7 +109,8 @@ namespace PaintsAndDyes
             DaggerfallUI.UIManager.PopWindow();
 
             validPaintItems[index].dyeColor = paintBeingUsed.dyeColor;
-            playerEntity.Items.RemoveItem(paintBeingUsed);
+            if (collectionBeingUsed != null)
+                collectionBeingUsed.RemoveItem(paintBeingUsed);
 
             DaggerfallUI.Instance.InventoryWindow.Refresh();
         }

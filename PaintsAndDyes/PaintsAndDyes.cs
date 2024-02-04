@@ -10,12 +10,10 @@ using UnityEngine;
 using System;
 using Wenzil.Console;
 using DaggerfallWorkshop.Game.Items;
-using DaggerfallWorkshop.Utility;
 using DaggerfallWorkshop;
-using System.Collections.Generic;
-using DaggerfallConnect;
 using DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings;
-using System.Linq;
+using DaggerfallWorkshop.Game.Utility;
+using DaggerfallConnect;
 
 namespace PaintsAndDyes
 {
@@ -25,6 +23,7 @@ namespace PaintsAndDyes
 
         static PlayerEntity playerEntity = GameManager.Instance.PlayerEntity;
 
+        public static bool rriArmors;
 
         [Invoke(StateManager.StateTypes.Start, 0)]
         public static void Init(InitParams initParams)
@@ -35,10 +34,20 @@ namespace PaintsAndDyes
 
             DaggerfallUnity.Instance.ItemHelper.RegisterCustomItem(Paint.templateIndex, ItemGroups.UselessItems2, typeof(Paint));
             DaggerfallUnity.Instance.ItemHelper.RegisterCustomItem(Dye.templateIndex, ItemGroups.UselessItems2, typeof(Dye));
+
+            StartGameBehaviour.OnStartGame += PaintsAndDyes_OnStartGame;
+
+            PlayerActivate.OnLootSpawned += AddPaintsDyes_OnLootSpawned;
         }
 
         void Awake()
         {
+            Mod rri = ModManager.Instance.GetMod("RoleplayRealism-Items");
+            if (rri != null)
+            {
+                ModSettings rriSettings = rri.GetSettings();
+                rriArmors = rriSettings.GetBool("Modules", "newArmor");
+            }
             mod.IsReady = true;
             Debug.Log("[SkillBooks] Ready");
         }
@@ -55,6 +64,38 @@ namespace PaintsAndDyes
 
         }
 
+        private static void PaintsAndDyes_OnStartGame(object sender, EventArgs e)
+        {
+            DaggerfallUnityItem pants = playerEntity.ItemEquipTable.GetItem(EquipSlots.LegsClothes);
+            pants.dyeColor = ItemBuilder.RandomClothingDye();
+        }
+
+        public static void AddPaintsDyes_OnLootSpawned(object sender, ContainerLootSpawnedEventArgs e)
+        {
+            DaggerfallInterior interior = GameManager.Instance.PlayerEnterExit.Interior;
+            if (interior != null &&
+                e.ContainerType == LootContainerTypes.ShopShelves &&
+                (interior.BuildingData.BuildingType == DFLocation.BuildingTypes.Alchemist || interior.BuildingData.BuildingType == DFLocation.BuildingTypes.ClothingStore))
+            {
+                int numDyes = Mathf.Clamp(UnityEngine.Random.Range(0, interior.BuildingData.Quality), 1, 12);
+
+                while (numDyes > 0)
+                {
+                    DaggerfallUnityItem item = ItemBuilder.CreateItem(ItemGroups.UselessItems2, Dye.templateIndex);
+                    e.Loot.AddItem(item);
+                    numDyes--;
+                }
+
+                int numPaints = Mathf.Clamp(UnityEngine.Random.Range(0, interior.BuildingData.Quality), 1, 12);
+
+                while (numPaints > 0)
+                {
+                    DaggerfallUnityItem item = ItemBuilder.CreateItem(ItemGroups.UselessItems2, Paint.templateIndex);
+                    e.Loot.AddItem(item);
+                    numPaints--;
+                }
+            }
+        }
 
         public static void RegisterSBCommands()
         {
@@ -83,18 +124,16 @@ namespace PaintsAndDyes
                     return usage;
                 if (!int.TryParse(args[0], out value))
                     return string.Format("Could not parse argument `{0}` to a number", args[0]);
-                if (value < 0 || value > 10)
+                if (value < 0 || value > 19)
                     return string.Format("Index {0} is out range. Must be 0-10.", value);
                 if (args == null || args.Length < 1 || args.Length > 1)
                     return usage;
                 else if (args.Length == 1 && value < 11)
                 {
-                    if (value < 2)
-                        value += 15;
-                    else if (value == 3)
-                        value = 19;
-                    else
-                        value += 16;
+                    value += 15;
+                    if (value == 17)
+                        value = 18;
+
 
                     Paint.color = (DyeColors)value;
                     DaggerfallUnityItem paintBottle = ItemBuilder.CreateItem(ItemGroups.UselessItems2, Paint.templateIndex);

@@ -26,6 +26,7 @@ namespace PaintsAndDyes
         public static DyeColors color = DyeColors.Iron;
 
         static DaggerfallUnityItem dyeBeingUsed = null;
+        static ItemCollection collectionBeingUsed = null;
 
         public Dye() : base(ItemGroups.UselessItems2, templateIndex)
         {
@@ -70,6 +71,7 @@ namespace PaintsAndDyes
             }
 
             dyeBeingUsed = this;
+            collectionBeingUsed = collection;
             DaggerfallListPickerWindow validItemPicker = new DaggerfallListPickerWindow(uiManager, uiManager.TopWindow);
             validItemPicker.OnItemPicked += Dye_OnItemPicked;
             validDyeItems.Clear();
@@ -102,11 +104,10 @@ namespace PaintsAndDyes
             DaggerfallUI.UIManager.PopWindow();
 
             validDyeItems[index].dyeColor = dyeBeingUsed.dyeColor;
-            playerEntity.Items.RemoveItem(dyeBeingUsed);
+            if (collectionBeingUsed != null)
+                collectionBeingUsed.RemoveItem(dyeBeingUsed);
 
             DaggerfallUI.Instance.InventoryWindow.Refresh();
-
-
         }
 
         public string DyeName(DyeColors color)
